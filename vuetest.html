@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Vue 事件修饰符</title>
+    <script src="vue.js"></script>
+    <style>
+        #hexagon { 
+width: 100px; 
+height: 55px; 
+background: red; 
+position: relative; 
+} 
+#hexagon:before { 
+content: ""; 
+position: absolute; 
+top: -25px; 
+left: 0; 
+width: 0; 
+height: 0; 
+border-left: 50px solid transparent; 
+border-right: 50px solid transparent; 
+border-bottom: 25px solid red; 
+} 
+#hexagon:after { 
+content: ""; 
+position: absolute; 
+bottom: -25px; 
+left: 0; 
+width: 0; 
+height: 0; 
+border-left: 50px solid transparent; 
+border-right: 50px solid transparent; 
+border-top: 25px solid red; 
+} 
+    </style>
+</head>
+<body>
+    <div id="app">
+        <p v-html='msg'></p>
+        <div @click = "alert(1)">
+            <a href="/#" @click.prevent.self="alert(2)">
+                <div @click = "alert(3)">点击测试</div>
+            </a>
+        </div>
+        <hr>
+        <p>v-modal</p>
+        <div>
+            <p>单个勾选框</p>
+            <input type="checkbox" id="checkbox1" v-model="checked" >
+            <label for="checkbox1">{{checked}}</label>
+        </div>
+        <div>
+            <p>多个勾选框，绑定到一个数组</p>
+            <input type="checkbox" name="" id="jack" value="jack" v-model='checknames'>
+            <label for="jack">jack</label>
+            <input type="checkbox" name="" id="john" value="john" v-model='checknames'>
+            <label for="john">john</label>
+            <input type="checkbox" name="" id="lili" value="lili" v-model='checknames'>
+            <label for="lili">lili</label>
+            <p>你选择了：{{mingdan}}</p>
+        </div>
+        <div>
+            <p>单选按钮</p>
+            <input type="radio" name="" id="one" v-model="picked" value="one">
+            <label for="one">One</label>
+            <input type="radio" name="" id="two" v-model="picked" value="two">
+            <label for="two">Two</label>
+            <p><span>Picked:{{picked}}</span></p> 
+        </div>
+        <div>
+            <p>动态选项</p>
+            <select name="" id="" v-model="selected" multiple>
+                <option value="" v-for="option in options" v-bind:value="option.value">{{option.text}}</option>
+            </select>
+            <p>Selected:{{selected}}</p>
+        </div>
+        <div>
+            <p>修饰符 .lazy .number .trim</p>
+            <input type="text" v-model.lazy="msg2">
+            <p>{{msg2}}</p>
+        </div>
+        <hr>
+        <div>
+            <my-component></my-component>
+            <my-component2></my-component2>
+        </div>
+        <hr>
+        <div>父子组件通信</div>
+        <child my-message="guoli"></child>
+        <p>动态props</p>
+        <child v-bind:my-message="mymsg"></child> 
+        <input type="text" v-model="mymsg">
+        <p></p>
+        <child :my-message='msg2'>{{msg}}</child>
+        <div id="hexagon"></div>
+    </div>
+    <script>
+        //注册全局组件
+        Vue.component('my-component',{
+            template:`
+                <div>我是自定义全局组件 my-component，{{msg}}</div>
+            `,
+            data:function(){
+                return {
+                    msg:"组件中的data必须是函数"
+                }
+            }
+        })
+        Vue.component('child',{
+            template:`
+                <div>{{myMessage}}</div>
+            `,
+            props:['myMessage'],
+            data:function(){
+                return{
+                    msg:this.myMessage
+                }
+            }
+        })
+        var child = {
+            template:' <div>我是局部组件 my-component2</div>', 
+        }
+        var app = new Vue({
+            el:"#app",
+            data:{
+                msg:`
+                   <p>
+                    事件修饰符</br>
+                    .stop 阻止冒泡</br>
+                    .prevent 阻止默认事件</br>
+                    .slef 事件在该元素本身触发才能触发回调
+                   </p>
+                `,
+                checked:true,
+                checknames:[],
+                picked:'one',
+                options:[
+                    {text:'one',value:'a'},
+                    {text:'two',value:'b'},
+                    {text:'three',value:'c'}
+                ],
+                selected:[],
+                msg2:'333',
+                mymsg:''
+            },
+            methods:{
+                alert:function(n){
+                    alert(n)
+                }
+            },
+            computed:{
+                mingdan:function(){
+                    return this.checknames.join('、')
+
+                }
+            },
+            components:{
+                'my-component2':child,
+                props:['mymessage']
+            }
+        })
+    </script>
+</body>
+</html>
